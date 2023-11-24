@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Public Toilets</string>
+
+    <string name="splash_screen_title">Splash Screen</string>
+    <string name="toilet_list_title">Toilet List</string>
+    <string name="toilet_map_title">Toilet Map</string>
+    <string name="toilet_detail_title">Toilet Detail</string>
+
+    <string name="list_item_address">Address: </string>
+    <string name="list_item_opening">Opening time: </string>
+    <string name="list_item_pmr">PMR Access: </string>
+</resources>
