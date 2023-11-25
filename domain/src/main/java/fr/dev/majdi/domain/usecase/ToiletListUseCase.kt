@@ -20,13 +20,54 @@ class ToiletListUseCase @Inject constructor(
     private var start: String = ""
     private var rows: String = ""
 
+    /**
+     * Set params before calling Service
+     */
     fun setParams(startValue: Int, rowsValue: Int) {
         start = startValue.toString()
         rows = rowsValue.toString()
     }
 
-    override suspend fun buildUseCase(): Flow<Result<List<Toilet>>> {
+    /**
+     * Call Service
+     */
+    override suspend fun serviceUseCase(): Flow<Result<List<Toilet>>> {
         return toiletListRepository.getToilets(dataSet, start, rows)
+    }
+
+    /**
+     * Save local toilet data
+     */
+    fun saveLocalToilet(toilet: Toilet) {
+        toiletListRepository.addLocalToilet(toilet)
+    }
+
+    /**
+     * Delete local toilet data
+     */
+    fun deleteLocalToilet(toilet: Toilet) {
+        toiletListRepository.deleteLocalToilet(toilet)
+    }
+
+    /**
+     * Delete all local toilets data
+     */
+    fun deleteAllToilets() {
+        toiletListRepository.deleteAllToilet()
+    }
+
+    /**
+     * Update local toilet data
+     */
+    fun updateToilet(toilet: Toilet) {
+        toiletListRepository.updateLocalToilet(toilet)
+    }
+
+    /**
+     * Load local toilets list from local
+     */
+    fun loadListToiletFromLocal(): MutableList<Toilet> {
+        return toiletListRepository.loadAllLocalToilet()
     }
 
 }

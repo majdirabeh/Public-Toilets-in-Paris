@@ -1,8 +1,6 @@
 package fr.dev.majdi.data.di
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -12,8 +10,10 @@ import dagger.hilt.components.SingletonComponent
 import fr.dev.majdi.data.datasource.local.AppDatabase
 import fr.dev.majdi.data.datasource.remote.ToiletService
 import fr.dev.majdi.data.repository.ToiletListRepositoryImp
+import fr.dev.majdi.data.repository.ToiletMapRepositoryImp
 import fr.dev.majdi.data.util.Constants.Companion.BASE_URL
 import fr.dev.majdi.domain.repository.ToiletListRepository
+import fr.dev.majdi.domain.repository.ToiletMapRepository
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -31,9 +31,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class NetworkModule {
-
-    @Provides
-    fun provideBaseUrl() = BASE_URL
 
     @Provides
     @Singleton
@@ -108,15 +105,6 @@ class NetworkModule {
         return Gson()
     }
 
-    @Provides
-    @Singleton
-    fun provideIsNetworkAvailable(@ApplicationContext context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-        return activeNetwork != null && activeNetwork.isConnected
-    }
-
     @Singleton
     @Provides
     fun provideService(retrofit: Retrofit): ToiletService {
@@ -130,6 +118,15 @@ class NetworkModule {
         toiletService: ToiletService
     ): ToiletListRepository {
         return ToiletListRepositoryImp(appDatabase, toiletService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideToiletMapRepository(
+        appDatabase: AppDatabase,
+        toiletService: ToiletService
+    ): ToiletMapRepository {
+        return ToiletMapRepositoryImp(appDatabase, toiletService)
     }
 
 }

@@ -2,7 +2,6 @@ package fr.dev.majdi.presentation.toiletdetailscreen
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import fr.dev.majdi.domain.usecase.ToiletListUseCase
 import javax.inject.Inject
 
 /**
@@ -11,6 +10,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ToiletDetailViewModel @Inject constructor(
-
+    //we can add use case detail if we want to get detail from service
 ) : ViewModel() {
+    // Add logic of getting detail Toilet from API if we need
 }

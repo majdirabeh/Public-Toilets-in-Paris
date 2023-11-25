@@ -1,5 +1,6 @@
 package fr.dev.majdi.domain.usecase
 
+import fr.dev.majdi.domain.model.Toilet
 import fr.dev.majdi.domain.repository.ToiletMapRepository
 import javax.inject.Inject
 
@@ -10,5 +11,9 @@ import javax.inject.Inject
 class ToiletMapUseCase @Inject constructor(
     private val toiletMapRepository: ToiletMapRepository
 ) {
+
+    fun loadAllLocalToilet(): MutableList<Toilet> {
+        return toiletMapRepository.loadAllLocalToilet()
+    }
 
 }

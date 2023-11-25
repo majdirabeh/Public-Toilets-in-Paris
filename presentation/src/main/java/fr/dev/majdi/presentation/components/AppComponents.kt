@@ -16,6 +16,10 @@ import fr.dev.majdi.presentation.R
  * Created by Majdi RABEH on 24/11/2023.
  * Email m.rabeh.majdi@gmail.com
  */
+/**
+ *Common Components
+ */
+//App Bar for the app if needed
 @Composable
 fun AppBar(
     title: String,
@@ -33,7 +37,7 @@ fun AppBar(
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
             }
         },
-        backgroundColor = colorResource(id = R.color.purple_200),
+        backgroundColor = colorResource(id = R.color.purple_700),
         contentColor = Color.White
     )
 }

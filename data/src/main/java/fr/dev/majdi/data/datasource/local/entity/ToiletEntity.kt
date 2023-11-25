@@ -13,12 +13,12 @@ data class ToiletEntity(
     @PrimaryKey
     val recordId: String,
     val complementAddress: String,
-    val horaire: String,
-    val accesPmr: String,
+    val horaire: String?,
+    val accesPmr: String?,
     val arrondissement: Int,
     val source: String,
     val gestionnaire: String,
-    val adresse: String,
+    val adresse: String?,
     val type: String,
     val latitudeGeometry: Double,
     val longitudeGeometry: Double

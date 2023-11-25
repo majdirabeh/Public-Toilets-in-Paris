@@ -1,5 +1,7 @@
 package fr.dev.majdi.presentation
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,16 +21,23 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import fr.dev.majdi.presentation.toiletdetailscreen.ToiletDetailScreen
 import fr.dev.majdi.presentation.toiletslistscreen.ToiletListScreen
 import fr.dev.majdi.presentation.toiletslistscreen.ToiletListViewModel
 import fr.dev.majdi.presentation.toiletsmapscreen.ToiletMapScreen
+import fr.dev.majdi.presentation.toiletsmapscreen.ToiletMapViewModel
 import fr.dev.majdi.presentation.ui.Screen
+import fr.dev.majdi.presentation.util.ConnectivityReceiver
+import fr.dev.majdi.presentation.util.OnConnectivityChangedListener
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), OnConnectivityChangedListener {
 
     private val toiletListViewModel: ToiletListViewModel by viewModels()
+    private val toiletMapViewModel: ToiletMapViewModel by viewModels()
+
+    private val connectivityReceiver = ConnectivityReceiver(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +59,7 @@ class MainActivity : ComponentActivity() {
                                 selected = currentRoute == screen.route,
                                 onClick = {
                                     navController.navigate(screen.route) {
-                                         popUpTo(navController.graph.findStartDestination().id) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
                                         }
                                         // Avoid multiple copies of the same destination when
@@ -71,16 +80,29 @@ class MainActivity : ComponentActivity() {
                     startDestination = Screen.ToiletListScreen.route
                 ) {
                     composable(Screen.ToiletListScreen.route) {
-                        ToiletListScreen(toiletListViewModel, navController)
+                        ToiletListScreen(toiletListViewModel)
                     }
                     composable(Screen.ToiletMapScreen.route) {
-                        ToiletMapScreen(navController)
-                    }
-                    composable(Screen.ToiletDetailScreen.route) {
-                        ToiletDetailScreen(navController)
+                        ToiletMapScreen(toiletMapViewModel)
                     }
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(connectivityReceiver, intentFilter)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(connectivityReceiver)
+    }
+
+
+    override fun onConnectivityChanged(isConnected: Boolean) {
+        toiletListViewModel._isInternetAvailable.value = isConnected
     }
 }

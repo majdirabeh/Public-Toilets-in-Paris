@@ -1,10 +1,10 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    //Adding Plugin Kapt
-    id("kotlin-kapt")
     //Adding Plugin Hilt
     id("dagger.hilt.android.plugin")
+    //Adding Plugin Kapt
+    id("kotlin-kapt")
 }
 
 android {
@@ -17,7 +17,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
+        multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -65,7 +65,11 @@ dependencies {
 
     //Hilt library
     implementation ("com.google.dagger:hilt-android:2.44")
-    kapt ("com.google.dagger:hilt-android-compiler:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
 
     implementation("androidx.compose.runtime:runtime:1.5.4")
+
+    //Activate multidex
+    implementation("androidx.multidex:multidex:2.0.1")
+
 }

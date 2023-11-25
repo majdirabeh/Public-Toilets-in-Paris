@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
  */
 abstract class SingleUseCase<T> : UseCase() {
 
-    internal abstract suspend fun buildUseCase(): Flow<Result<T>>
+    internal abstract suspend fun serviceUseCase(): Flow<Result<T>>
 
     fun execute(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -23,7 +23,7 @@ abstract class SingleUseCase<T> : UseCase() {
     ) {
         cancelLast()
         lastJob = CoroutineScope(dispatcher).launch {
-            buildUseCase().flowOn(dispatcher).collect { result ->
+            serviceUseCase().flowOn(dispatcher).collect { result ->
                 when (result) {
                     is Result.Success -> onSuccess(result.data)
                     is Result.Failure -> onError(result.exception)

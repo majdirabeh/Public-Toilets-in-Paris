@@ -4,11 +4,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.dev.majdi.presentation.MainActivity
 import fr.dev.majdi.presentation.SplashScreenActivity
-import fr.dev.majdi.presentation.ui.Screen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject

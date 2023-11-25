@@ -1,6 +1,7 @@
 package fr.dev.majdi.publictoilets
 
-import android.app.Application
+import androidx.multidex.MultiDex
+import androidx.multidex.MultiDexApplication
 import dagger.hilt.android.HiltAndroidApp
 
 /**
@@ -8,6 +9,11 @@ import dagger.hilt.android.HiltAndroidApp
  * Email m.rabeh.majdi@gmail.com
  */
 @HiltAndroidApp
-class AppToilet : Application() {
+class AppToilet : MultiDexApplication() {
+
+    override fun onCreate() {
+        super.onCreate()
+        MultiDex.install(this)
+    }
 
 }

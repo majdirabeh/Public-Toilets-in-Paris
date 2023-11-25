@@ -1,9 +1,9 @@
 package fr.dev.majdi.domain.model
 
 data class Toilet(
-    val datasetid: String,
-    val fields: Fields,
-    val geometry: Geometry,
-    val record_timestamp: String,
-    val recordid: String
+    var datasetid: String,
+    var fields: Fields,
+    var geometry: Geometry,
+    var record_timestamp: String,
+    var recordid: String
 )

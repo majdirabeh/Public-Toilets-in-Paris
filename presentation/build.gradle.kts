@@ -61,7 +61,6 @@ dependencies {
     //Hilt library
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
-
     //Navigation compose
     implementation("androidx.navigation:navigation-compose:2.7.5")
     //Compose
@@ -76,9 +75,10 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 
     //Icons library
-    implementation ("androidx.compose.material:material-icons-extended-android:1.5.4")
-
-
+    implementation("androidx.compose.material:material-icons-extended-android:1.5.4")
+    /*mapbox*/
+    api ("com.mapbox.maps:android:10.14.0")
+    api ("com.mapbox.mapboxsdk:mapbox-sdk-turf:6.6.0")
     //Animation Splash
     implementation("com.airbnb.android:lottie-compose:6.1.0")
 }
