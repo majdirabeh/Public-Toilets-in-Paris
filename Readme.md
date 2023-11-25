@@ -16,6 +16,9 @@ Une application qui permet de voir tous les toilettes public sur Paris
 8- Retrofit2
 9- Coroutines
 10- Clean architecture
+11- Room
+12- Lottie compose
+...
 
 ### Pré-requis
 
@@ -38,6 +41,13 @@ Juste clone le projet
 ## Auteurs
 Listez le(s) auteur(s) du projet ici !
 * **Majdi RABEH** _alias_ [@majdirabeh](https://github.com/majdirabeh)
+
+## Next Features
+
+- Navigation vers la toilette choisie guidage sur map
+- Light/ Dark mode
+- Afficher l'application par Langue de téléphone
+- Design detail toilet
 
 
 ## License
