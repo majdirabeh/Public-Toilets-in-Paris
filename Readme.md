@@ -15,6 +15,7 @@ Une application qui permet de voir tous les toilettes public sur Paris
 7- Navigation Components
 8- Retrofit2
 9- Coroutines
+10- Clean architecture
 
 ### Pré-requis
 
