@@ -273,6 +273,9 @@ fun MapBoxMap(
                                     .withIconSize(0.5)
                                     //.withData(data)
                                     .withIconImage(markerToilet!!)
+                                //TODO The Map Crash her
+                                //I have this message => Source mapbox-android-pointAnnotation-source-1 already exists
+                                //TODO I should see what going on
                                 it.create(toiletPointAnnotationOptions)
                             }
                         }
