@@ -6,19 +6,19 @@ Une application qui permet de voir tous les toilettes public sur Paris
 
 ## Main Features
 
-1- Kotlin
-2- MVVM
-3- Jetpack Compose
-4- MutableState
-5- Simpler than LiveData or Flow with respect to composables.
-6- Hilt
-7- Navigation Components
-8- Retrofit2
-9- Coroutines
-10- Clean architecture
-11- Room
-12- Lottie compose
-...
+- Kotlin
+- MVVM
+- Jetpack Compose
+- MutableState
+- Simpler than LiveData or Flow with respect to composables.
+- Hilt
+- Navigation Components
+- Retrofit2
+- Coroutines
+- Clean architecture
+- Room
+- Lottie compose
+- others 
 
 ### Pré-requis
 
