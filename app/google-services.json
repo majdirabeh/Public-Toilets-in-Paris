@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "536411522903",
+    "project_id": "public-toilets-paris",
+    "storage_bucket": "public-toilets-paris.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536411522903:android:9b77aa53827971fda2a012",
+        "android_client_info": {
+          "package_name": "fr.dev.majdi.publictoilets"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqSp_FHcd4O04fJWXuC8dnhonkCInIfS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

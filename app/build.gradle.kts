@@ -5,6 +5,10 @@ plugins {
     id("dagger.hilt.android.plugin")
     //Adding Plugin Kapt
     id("kotlin-kapt")
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
+    // Add the Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -55,6 +59,9 @@ android {
     hilt {
         enableAggregatingTask = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.4"
+    }
 }
 
 dependencies {
@@ -64,12 +71,19 @@ dependencies {
     implementation (project(":presentation"))
 
     //Hilt library
-    implementation ("com.google.dagger:hilt-android:2.44")
+    implementation ("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
 
     implementation("androidx.compose.runtime:runtime:1.5.4")
 
     //Activate multidex
     implementation("androidx.multidex:multidex:2.0.1")
+
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
 
 }

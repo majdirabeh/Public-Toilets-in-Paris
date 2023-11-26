@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.dev.majdi.domain.model.Toilet
 import fr.dev.majdi.domain.usecase.ToiletListUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -85,13 +86,17 @@ class ToiletListViewModel @Inject constructor(
 
     // Function to filter toilets by PMR accessibility
     fun filterToiletsByPmr(accessPmr: Boolean, showAllToilets: Boolean) {
-        if (showAllToilets) {
-            _filteredToiletListLiveData.value = toiletListLiveData.value
-        } else {
-            _filteredToiletListLiveData.value = if (accessPmr) {
-                toiletListLiveData.value?.filter { it.fields.acces_pmr == "Oui" }
-            } else {
-                toiletListLiveData.value?.filter { it.fields.acces_pmr == "Non" }
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main){
+                if (showAllToilets) {
+                    _filteredToiletListLiveData.postValue(toiletListLiveData.value)
+                } else {
+                    _filteredToiletListLiveData.value = if (accessPmr) {
+                        toiletListLiveData.value?.filter { it.fields.acces_pmr == "Oui" }
+                    } else {
+                        toiletListLiveData.value?.filter { it.fields.acces_pmr == "Non" }
+                    }
+                }
             }
         }
     }

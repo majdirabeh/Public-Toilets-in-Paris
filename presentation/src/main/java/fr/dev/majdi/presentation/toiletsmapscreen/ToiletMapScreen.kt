@@ -1,6 +1,8 @@
 package fr.dev.majdi.presentation.toiletsmapscreen
 
 import android.annotation.SuppressLint
+import android.util.Log
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -25,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +44,8 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.plugin.animation.CameraAnimatorOptions.Companion.cameraAnimatorOptions
+import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
@@ -53,8 +56,9 @@ import fr.dev.majdi.domain.model.Toilet
 import fr.dev.majdi.domain.util.LocationService
 import fr.dev.majdi.presentation.R
 import fr.dev.majdi.presentation.util.areCoordinatesEqual
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * Created by Majdi RABEH on 24/11/2023.
@@ -192,6 +196,7 @@ fun MapScreen(toilets: List<Toilet> = listOf()) {
     }
 }
 
+@SuppressLint("CheckResult")
 @Composable
 fun MapBoxMap(
     modifier: Modifier = Modifier,
@@ -213,8 +218,6 @@ fun MapBoxMap(
     var pointAnnotationManager: PointAnnotationManager? by remember {
         mutableStateOf(null)
     }
-
-    val coroutineScope = rememberCoroutineScope()
 
     AndroidView(
         factory = {
@@ -246,46 +249,88 @@ fun MapBoxMap(
         },
         update = { map ->
             mapBox.value = map.getMapboxMap()
-            coroutineScope.launch(Dispatchers.IO) {
-                if (point != null) {
-                    pointAnnotationManager?.let {
-                        it.deleteAll()
-                        val pointAnnotationOptions = PointAnnotationOptions()
-                            .withPoint(point)
-                            .withIconAnchor(IconAnchor.CENTER)
-                            .withIconSize(0.5)
-                            .withIconImage(myLocation!!)
+            if (point != null) {
+                pointAnnotationManager?.let {
+                    it.deleteAll()
 
-                        it.create(pointAnnotationOptions)
-                        if (toilets.isNotEmpty()) {
-                            for (location in toilets) {
-                                val toiletPoint = Point.fromLngLat(
-                                    location.fields.geo_point_2d.first(),
-                                    location.fields.geo_point_2d.last()
-                                )
-                                //We can pass data if we want
-                                //val data = JsonObject()
-                                //data.addProperty("recordid", location.recordid)
-
-                                val toiletPointAnnotationOptions = PointAnnotationOptions()
-                                    .withPoint(toiletPoint)
-                                    .withIconAnchor(IconAnchor.CENTER)
-                                    .withIconSize(0.5)
-                                    //.withData(data)
-                                    .withIconImage(markerToilet!!)
-                                //TODO The Map Crash her
-                                //I have this message => Source mapbox-android-pointAnnotation-source-1 already exists
-                                //TODO I should see what going on
-                                it.create(toiletPointAnnotationOptions)
-                            }
+                    Observable.just(point)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { pt ->
+                            val pointAnnotationOptions = PointAnnotationOptions()
+                                .withPoint(pt)
+                                .withIconAnchor(IconAnchor.CENTER)
+                                .withIconSize(0.5)
+                                .withIconImage(myLocation!!)
+                            it.create(pointAnnotationOptions)
                         }
 
-                        //Center the map on Paris
-                        val paris = Point.fromLngLat(2.3509871, 48.8566667)
-                        map.getMapboxMap()
-                            .flyTo(CameraOptions.Builder().zoom(10.0).center(paris).build())
+                    Observable.fromIterable(toilets)
+                        .flatMap { toilet ->
+                            val toiletPoint = Point.fromLngLat(
+                                toilet.fields.geo_point_2d.first(),
+                                toilet.fields.geo_point_2d.last()
+                            )
+                            // Create a marker for each MapObject
+                            val toiletPointAnnotationOptions = PointAnnotationOptions()
+                                .withPoint(toiletPoint)
+                                .withIconAnchor(IconAnchor.CENTER)
+                                .withIconSize(0.5)
+                                //.withData(data)
+                                .withIconImage(markerToilet!!)
+                            Log.e("RXJAVA", "flatMap $toiletPoint")
+                            Observable.just(toiletPointAnnotationOptions)
 
-                    }
+                        }
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnTerminate {
+                            Log.e("RXJAVA", "doOnTerminate")
+                        }.doFinally {
+                            Log.e("RXJAVA", "doFinally")
+                            //Center the map on Paris
+                            val paris = Point.fromLngLat(2.3509871, 48.8566667)
+
+                            map.getMapboxMap()
+                                .flyTo(
+                                    CameraOptions.Builder()
+                                        .zoom(10.0)
+                                        .center(paris)
+                                        .build()
+                                )
+                            //animate camera
+                            map.camera.apply {
+                                val bearing = createBearingAnimator(cameraAnimatorOptions(-45.0)) {
+                                    duration = 4000
+                                    interpolator = AccelerateDecelerateInterpolator()
+                                }
+                                val zoom = createZoomAnimator(
+                                    cameraAnimatorOptions(11.0) {
+                                        startValue(3.0)
+                                    }
+                                ) {
+                                    duration = 4000
+                                    interpolator = AccelerateDecelerateInterpolator()
+                                }
+                                val pitch = createPitchAnimator(
+                                    cameraAnimatorOptions(55.0) {
+                                        startValue(0.0)
+                                    }
+                                ) {
+                                    duration = 4000
+                                    interpolator = AccelerateDecelerateInterpolator()
+                                }
+                                playAnimatorsSequentially(zoom, pitch, bearing)
+                            }
+                        }
+                        .doOnComplete {
+                            Log.e("RXJAVA", "doOnComplete")
+                        }
+                        .subscribe { toiletPointAnnotationOptions ->
+                            // Add the marker to the map
+                            it.create(toiletPointAnnotationOptions)
+                            Log.e("RXJAVA", "subscribe")
+                        }
                 }
             }
             NoOpUpdate

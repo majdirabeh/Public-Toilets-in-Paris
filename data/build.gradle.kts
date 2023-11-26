@@ -35,13 +35,16 @@ android {
     hilt {
         enableAggregatingTask = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.4"
+    }
 }
 
 dependencies {
     implementation (project(":domain"))
 
     //Hilt Library
-    implementation ("com.google.dagger:hilt-android:2.44")
+    implementation ("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     //Retrofit Library
     api ("com.squareup.retrofit2:retrofit:2.9.0")

@@ -15,9 +15,11 @@ Une application qui permet de voir tous les toilettes public sur Paris
 - Navigation Components
 - Retrofit2
 - Coroutines
+- RXJava
 - Clean architecture
 - Room
 - Lottie compose
+- Crashlytics
 - others 
 
 ### Pré-requis

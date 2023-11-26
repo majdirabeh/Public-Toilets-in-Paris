@@ -49,7 +49,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = "1.4.4"
     }
     hilt {
         enableAggregatingTask = true
@@ -59,7 +59,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     //Hilt library
-    implementation("com.google.dagger:hilt-android:2.44")
+    implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     //Navigation compose
     implementation("androidx.navigation:navigation-compose:2.7.5")
@@ -73,6 +73,10 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.runtime:runtime:1.5.4")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+
+    //RxJava Library
+    implementation("io.reactivex.rxjava3:rxjava:3.0.0")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.0")
 
     //Icons library
     implementation("androidx.compose.material:material-icons-extended-android:1.5.4")
