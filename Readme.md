@@ -42,7 +42,6 @@ Juste clone le projet
 **Dernière version :** 1.0.0
 
 ## Auteurs
-Listez le(s) auteur(s) du projet ici !
 * **Majdi RABEH** _alias_ [@majdirabeh](https://github.com/majdirabeh)
 
 ## Next Features
