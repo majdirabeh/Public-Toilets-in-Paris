@@ -1,7 +1,6 @@
 package fr.dev.majdi.presentation.toiletsmapscreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -59,6 +58,7 @@ import fr.dev.majdi.presentation.util.areCoordinatesEqual
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import timber.log.Timber
 
 /**
  * Created by Majdi RABEH on 24/11/2023.
@@ -249,11 +249,12 @@ fun MapBoxMap(
         },
         update = { map ->
             mapBox.value = map.getMapboxMap()
-            if (point != null) {
-                pointAnnotationManager?.let {
-                    it.deleteAll()
 
-                    Observable.just(point)
+            pointAnnotationManager?.let {pointAnnotationManager->
+                pointAnnotationManager.deleteAll()
+
+                point?.let {
+                    Observable.just(it)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe { pt ->
@@ -262,77 +263,82 @@ fun MapBoxMap(
                                 .withIconAnchor(IconAnchor.CENTER)
                                 .withIconSize(0.5)
                                 .withIconImage(myLocation!!)
-                            it.create(pointAnnotationOptions)
-                        }
-
-                    Observable.fromIterable(toilets)
-                        .flatMap { toilet ->
-                            val toiletPoint = Point.fromLngLat(
-                                toilet.fields.geo_point_2d.first(),
-                                toilet.fields.geo_point_2d.last()
-                            )
-                            // Create a marker for each MapObject
-                            val toiletPointAnnotationOptions = PointAnnotationOptions()
-                                .withPoint(toiletPoint)
-                                .withIconAnchor(IconAnchor.CENTER)
-                                .withIconSize(0.5)
-                                //.withData(data)
-                                .withIconImage(markerToilet!!)
-                            Log.e("RXJAVA", "flatMap $toiletPoint")
-                            Observable.just(toiletPointAnnotationOptions)
-
-                        }
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnTerminate {
-                            Log.e("RXJAVA", "doOnTerminate")
-                        }.doFinally {
-                            Log.e("RXJAVA", "doFinally")
-                            //Center the map on Paris
-                            val paris = Point.fromLngLat(2.3509871, 48.8566667)
-
-                            map.getMapboxMap()
-                                .flyTo(
-                                    CameraOptions.Builder()
-                                        .zoom(10.0)
-                                        .center(paris)
-                                        .build()
-                                )
-                            //animate camera
-                            map.camera.apply {
-                                val bearing = createBearingAnimator(cameraAnimatorOptions(-45.0)) {
-                                    duration = 4000
-                                    interpolator = AccelerateDecelerateInterpolator()
-                                }
-                                val zoom = createZoomAnimator(
-                                    cameraAnimatorOptions(11.0) {
-                                        startValue(3.0)
-                                    }
-                                ) {
-                                    duration = 4000
-                                    interpolator = AccelerateDecelerateInterpolator()
-                                }
-                                val pitch = createPitchAnimator(
-                                    cameraAnimatorOptions(55.0) {
-                                        startValue(0.0)
-                                    }
-                                ) {
-                                    duration = 4000
-                                    interpolator = AccelerateDecelerateInterpolator()
-                                }
-                                playAnimatorsSequentially(zoom, pitch, bearing)
-                            }
-                        }
-                        .doOnComplete {
-                            Log.e("RXJAVA", "doOnComplete")
-                        }
-                        .subscribe { toiletPointAnnotationOptions ->
-                            // Add the marker to the map
-                            it.create(toiletPointAnnotationOptions)
-                            Log.e("RXJAVA", "subscribe")
+                            pointAnnotationManager.create(pointAnnotationOptions)
                         }
                 }
+
+                Observable.fromIterable(toilets)
+                    .flatMap { toilet ->
+                        val toiletPoint = Point.fromLngLat(
+                            toilet.fields.geo_point_2d.first(),
+                            toilet.fields.geo_point_2d.last()
+                        )
+                        // Create a marker for each MapObject
+                        val toiletPointAnnotationOptions = PointAnnotationOptions()
+                            .withPoint(toiletPoint)
+                            .withIconAnchor(IconAnchor.CENTER)
+                            .withIconSize(0.5)
+                            //.withData(data)
+                            .withIconImage(markerToilet!!)
+                        Timber.tag("ToiletMapScreen").e("flatMap $toiletPoint")
+                        Observable.just(toiletPointAnnotationOptions)
+
+                    }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError { throwable ->
+                        Timber.tag("ToiletMapScreen")
+                            .e("doOnError  ${throwable.message.toString()}")
+                        throwable.printStackTrace()
+                    }
+                    .doOnTerminate {
+                        Timber.tag("ToiletMapScreen").e("doOnTerminate")
+                    }.doFinally {
+                        Timber.tag("ToiletMapScreen").e("doFinally")
+                        //Center the map on Paris
+                        val paris = Point.fromLngLat(2.3509871, 48.8566667)
+                        map.getMapboxMap()
+                            .flyTo(
+                                CameraOptions.Builder()
+                                    .zoom(10.0)
+                                    .center(paris)
+                                    .build()
+                            )
+                        //animate camera
+                        map.camera.apply {
+                            val bearing = createBearingAnimator(cameraAnimatorOptions(-45.0)) {
+                                duration = 2000
+                                interpolator = AccelerateDecelerateInterpolator()
+                            }
+                            val zoom = createZoomAnimator(
+                                cameraAnimatorOptions(11.0) {
+                                    startValue(3.0)
+                                }
+                            ) {
+                                duration = 2000
+                                interpolator = AccelerateDecelerateInterpolator()
+                            }
+                            val pitch = createPitchAnimator(
+                                cameraAnimatorOptions(55.0) {
+                                    startValue(0.0)
+                                }
+                            ) {
+                                duration = 2000
+                                interpolator = AccelerateDecelerateInterpolator()
+                            }
+                            playAnimatorsSequentially(zoom, pitch, bearing)
+                        }
+                    }
+                    .doOnComplete {
+                        Timber.tag("ToiletMapScreen").e("doOnComplete")
+                    }
+                    .subscribe { toiletPointAnnotationOptions ->
+                        // Add the marker to the map
+                        pointAnnotationManager.create(toiletPointAnnotationOptions)
+                        Timber.tag("ToiletMapScreen").e("subscribe")
+                    }
             }
+
             NoOpUpdate
         },
         modifier = modifier
