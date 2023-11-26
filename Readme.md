@@ -4,7 +4,7 @@ _Android App_
 [![forthebadge](https://forthebadge.com/images/badges/made-with-kotlin.svg)](https://github.com/majdirabeh)  
 Une application qui permet de voir tous les toilettes public sur Paris
 
-## Main Features
+## Techno && Libs
 
 - Kotlin
 - MVVM
