@@ -402,8 +402,8 @@ class NavigationActivity : AppCompatActivity() {
             //Test 48.8502601, 2.4477689
             myLocation?.let {
                 if (it.size == 2) {
-                    myLatitude = 48.8502601 //it[0] ?: 0.0
-                    myLongitude = 2.4477689 //it[1] ?: 0.0
+                    myLatitude = it[0] ?: 0.0
+                    myLongitude = it[1] ?: 0.0
                 }
             }
 
