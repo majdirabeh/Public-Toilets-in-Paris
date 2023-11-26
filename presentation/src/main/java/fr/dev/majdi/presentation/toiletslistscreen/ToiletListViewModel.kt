@@ -3,6 +3,8 @@ package fr.dev.majdi.presentation.toiletslistscreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,9 +13,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.dev.majdi.domain.model.Toilet
 import fr.dev.majdi.domain.usecase.ToiletListUseCase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -23,7 +25,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ToiletListViewModel @Inject constructor(
     private val toiletListUseCase: ToiletListUseCase
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
+
+    private val tag = ToiletListViewModel::class.java.simpleName
 
     private val INITIAL_PAGE = 0
     private var currentPage = INITIAL_PAGE
@@ -39,10 +43,13 @@ class ToiletListViewModel @Inject constructor(
     val filteredToiletListLiveData: LiveData<List<Toilet>> get() = _filteredToiletListLiveData
 
     var inProgress by mutableStateOf(true)
-
+    var loadMore by mutableStateOf(false)
     var isToiletItemClicked by mutableStateOf(false)
     var selectedToilet by mutableStateOf<Toilet?>(null)
 
+    init {
+        Timber.tag(tag)
+    }
 
     fun getToiletListFromService(itemsToLoad: Int = pageSize) {
         if (!inProgress) {
@@ -51,7 +58,6 @@ class ToiletListViewModel @Inject constructor(
         }
 
         toiletListUseCase.setParams(startValue = currentPage * pageSize, rowsValue = itemsToLoad)
-
         toiletListUseCase.execute(
             onSuccess = { newData ->
                 viewModelScope.launch(Dispatchers.IO) {
@@ -64,18 +70,18 @@ class ToiletListViewModel @Inject constructor(
                     updatedList.map {
                         toiletListUseCase.saveLocalToilet(it)
                     }
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         _toiletListLiveData.postValue(updatedList)
                     }
-
                     currentPage++
                 }
             },
             onError = { error ->
-                error.printStackTrace()
+                Timber.tag("ToiletListViewModel").e(error.message.toString())
             },
             onFinished = {
                 inProgress = false
+                loadMore = false
                 //If we want we can get local data if the service not available or any problem
                 if (toiletListLiveData.value?.isEmpty() == true) {
                     loadToiletsFromLocal()
@@ -87,7 +93,7 @@ class ToiletListViewModel @Inject constructor(
     // Function to filter toilets by PMR accessibility
     fun filterToiletsByPmr(accessPmr: Boolean, showAllToilets: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 if (showAllToilets) {
                     _filteredToiletListLiveData.postValue(toiletListLiveData.value)
                 } else {
@@ -110,6 +116,36 @@ class ToiletListViewModel @Inject constructor(
             }
             inProgress = false
         }
+    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        Timber.e( "onCreate")
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        Timber.e( "onResume")
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        Timber.e(  "onStart")
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
+        Timber.e(  "onPause")
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        Timber.e(  "onStop")
+    }
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        super.onDestroy(owner)
+        Timber.e(  "onDestroy")
     }
 
 }

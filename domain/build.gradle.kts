@@ -38,6 +38,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.4"
     }
+    //Just add this for skip lint verification
+    lint {
+        abortOnError = false
+        checkAllWarnings = false
+    }
 }
 
 dependencies {

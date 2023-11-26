@@ -20,6 +20,7 @@ Une application qui permet de voir tous les toilettes public sur Paris
 - Room
 - Lottie compose
 - Crashlytics
+- Mapbox
 - others 
 
 ### Pré-requis
@@ -46,10 +47,41 @@ Listez le(s) auteur(s) du projet ici !
 
 ## Next Features
 
-- Navigation vers la toilette choisie guidage sur map
+- Navigation vers la toilette choisie guidage sur map (Done)
 - Light/ Dark mode
 - Afficher l'application par Langue de téléphone
 - Design detail toilet
+
+## Screenshots
+
+Splash Screen
+
+<img src="https://github.com/majdirabeh/Public-Toilets-in-Paris/blob/master/Screenshots/splash.png" style=" width:100px ; height:150px " />
+
+List Toilets
+
+<img src="https://github.com/majdirabeh/Public-Toilets-in-Paris/blob/master/Screenshots/list.png" style=" width:100px ; height:150px " />
+
+List 2 Toilets
+
+<img src="https://github.com/majdirabeh/Public-Toilets-in-Paris/blob/master/Screenshots/list1.png" style=" width:100px ; height:150px " />
+
+Map Toilets
+
+<img src="https://github.com/majdirabeh/Public-Toilets-in-Paris/blob/master/Screenshots/map.png" style=" width:100px ; height:150px " />
+
+Detail on Map
+
+<img src="https://github.com/majdirabeh/Public-Toilets-in-Paris/blob/master/Screenshots/detailMap.png" style=" width:100px ; height:150px " />
+
+Detail Toilet
+
+<img src="https://github.com/majdirabeh/Public-Toilets-in-Paris/blob/master/Screenshots/detail.png" style=" width:100px ; height:150px " />
+
+
+Navigation to Toilet
+
+<img src="https://github.com/majdirabeh/Public-Toilets-in-Paris/blob/master/Screenshots/navigation.png" style=" width:100px ; height:150px " />
 
 
 ## License

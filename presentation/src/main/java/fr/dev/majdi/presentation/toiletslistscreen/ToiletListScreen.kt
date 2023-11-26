@@ -2,7 +2,6 @@ package fr.dev.majdi.presentation.toiletslistscreen
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +35,6 @@ import androidx.compose.material.icons.filled.NotAccessible
 import androidx.compose.material.rememberBottomDrawerState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -54,11 +52,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import com.mapbox.geojson.Point
 import fr.dev.majdi.domain.model.Toilet
 import fr.dev.majdi.domain.util.LocationService
 import fr.dev.majdi.presentation.R
+import fr.dev.majdi.presentation.components.ComposableLifecycle
+import fr.dev.majdi.presentation.components.LoadingView
 import fr.dev.majdi.presentation.toiletdetailscreen.ToiletDetailScreen
 import fr.dev.majdi.presentation.util.calculateDistance
 import kotlinx.coroutines.launch
@@ -70,18 +72,13 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ToiletListScreen(toiletListViewModel: ToiletListViewModel) {
+
+    val context = LocalContext.current
+
     //I have some problem on gradle when using hiltViewModel on compose
     //val toiletListViewModel : ToiletListViewModel = hiltViewModel()
-    val isInternetConnected by toiletListViewModel.isInternetAvailable.observeAsState()
 
-    //Call API Or Getting Data from DataBase
-    LaunchedEffect(key1 = Unit) {
-        if (isInternetConnected == true) {
-            toiletListViewModel.getToiletListFromService()
-        } else {
-            toiletListViewModel.loadToiletsFromLocal()
-        }
-    }
+    val isInternetConnected by toiletListViewModel.isInternetAvailable.observeAsState()
 
     // Remember the LazyListState
     val lazyListState = rememberLazyListState()
@@ -100,6 +97,50 @@ fun ToiletListScreen(toiletListViewModel: ToiletListViewModel) {
     val bottomSheetState = rememberBottomDrawerState(BottomDrawerValue.Closed)
 
     var showButtons by remember { mutableStateOf(false) }
+
+    var relaunch by remember {
+        mutableStateOf(false)
+    }
+
+    //Implement this to find lifecycle of composable screen
+    ComposableLifecycle { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_CREATE -> {
+
+            }
+
+            Lifecycle.Event.ON_START -> {
+                //Call API Or Getting Data from DataBase
+                if (isInternetConnected == true) {
+                    if (toiletList.isNullOrEmpty()) {
+                        toiletListViewModel.getToiletListFromService()
+                    }
+                } else {
+                    toiletListViewModel.loadToiletsFromLocal()
+                }
+            }
+
+            Lifecycle.Event.ON_RESUME -> {
+
+            }
+
+            Lifecycle.Event.ON_PAUSE -> {
+
+            }
+
+            Lifecycle.Event.ON_STOP -> {
+
+            }
+
+            Lifecycle.Event.ON_DESTROY -> {
+
+            }
+
+            else -> {
+
+            }
+        }
+    }
 
     //BottomSheet to show detail Toilet
     BottomDrawer(drawerState = bottomSheetState,
@@ -149,52 +190,59 @@ fun ToiletListScreen(toiletListViewModel: ToiletListViewModel) {
                 }
             }
         }, content = { paddingValue ->
-            toiletListViewModel.inProgress.let {
-                if (it) {
-                    // Loading state
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = Color.Black.copy(alpha = 0.5f)
+            LoadingView(isLoading = toiletListViewModel.inProgress) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    toiletList?.let {
+                        if (it.isNotEmpty()) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .padding(paddingValue)
+                                    .fillMaxSize(),
+                                state = lazyListState
+                            ) {
+                                val list = if (showAllToilets) it else filteredToiletList
+                                items(items = list ?: emptyList()) { toilet ->
+                                    // Display toilets list
+                                    ListItemCard(
+                                        toilet,
+                                        toiletListViewModel,
+                                        point,
+                                        bottomSheetState
+                                    )
+                                }
+                                if (it.isNotEmpty() && lazyListState.isScrollInProgress) {
+                                    // Check if the user has scrolled to the end of the list
+                                    if (lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == toiletList?.size?.minus(
+                                            1
+                                        ) && isInternetConnected == true && !toiletListViewModel.loadMore
+                                    ) {
+                                        toiletListViewModel.loadMore = true
+                                    }
+                                }
+                            }
+                        } else {
+                            Text(
+                                text = stringResource(id = R.string.toilets_not_found),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(16.dp)
                             )
-                            .fillMaxSize()
-                            .padding(paddingValue), contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = Color.Blue
-                        )
-                    }
-                } else {
-                    // Data loaded, render the list
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(), state = lazyListState
-                    ) {
-                        val list = if (showAllToilets) toiletList else filteredToiletList
-                        items(items = list ?: emptyList()) { toilet ->
-                            // Display toilets list
-                            ListItemCard(toilet, toiletListViewModel, point, bottomSheetState)
-                        }
-                        // Check if the user has scrolled to the end of the list
-                        if (lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == toiletList?.size?.minus(
-                                1
-                            ) && isInternetConnected == true
-                        ) {
-                            // Load more data when reaching the end
-                            toiletListViewModel.inProgress = true
-                            toiletListViewModel.getToiletListFromService()
                         }
                     }
                 }
+
             }
         })
     }
 
-
-    var relaunch by remember {
-        mutableStateOf(false)
+    if (toiletListViewModel.loadMore && !toiletListViewModel.inProgress) {
+        toiletListViewModel.inProgress = true
+        toiletListViewModel.getToiletListFromService()
     }
 
-    val context = LocalContext.current
 
     val permissionRequest = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -232,6 +280,10 @@ fun ToiletListScreen(toiletListViewModel: ToiletListViewModel) {
 
                 is LocationService.LocationServiceException.UnknownException -> {
                     //handle unknown exception
+                }
+
+                else -> {
+
                 }
             }
         }

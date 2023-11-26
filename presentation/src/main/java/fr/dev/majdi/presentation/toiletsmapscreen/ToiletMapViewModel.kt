@@ -30,10 +30,10 @@ class ToiletMapViewModel @Inject constructor(
     val toiletListLiveData: LiveData<List<Toilet>> get() = _toiletListLiveData
 
     fun loadLocalToilets() {
-        inProgress = true
         viewModelScope.launch(Dispatchers.IO) {
+            inProgress = true
             val listToilet: List<Toilet> = toiletMapUseCase.loadAllLocalToilet()
-            delay(3000)
+            delay(1000)
             withContext(Dispatchers.Main) {
                 _toiletListLiveData.value = null
                 _toiletListLiveData.postValue(listToilet)

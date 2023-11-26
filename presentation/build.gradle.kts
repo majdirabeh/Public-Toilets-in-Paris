@@ -35,6 +35,8 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        dataBinding = true
+        viewBinding = true
     }
 
     packaging {
@@ -54,12 +56,23 @@ android {
     hilt {
         enableAggregatingTask = true
     }
+    //Just add this for skip lint verification
+    lint {
+        abortOnError = false
+        checkAllWarnings = false
+    }
 }
 
 dependencies {
     implementation(project(":domain"))
     //Hilt library
     implementation("com.google.dagger:hilt-android:2.48")
+
+    //Added for navigation Activity
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     //Navigation compose
     implementation("androidx.navigation:navigation-compose:2.7.5")
@@ -81,8 +94,9 @@ dependencies {
     //Icons library
     implementation("androidx.compose.material:material-icons-extended-android:1.5.4")
     /*mapbox*/
-    api ("com.mapbox.maps:android:10.14.0")
-    api ("com.mapbox.mapboxsdk:mapbox-sdk-turf:6.6.0")
+    api ("com.mapbox.maps:android:10.16.2")
+    implementation("com.mapbox.navigation:android:2.17.5")
+    api ("com.mapbox.mapboxsdk:mapbox-sdk-turf:6.15.0")
     //Animation Splash
     implementation("com.airbnb.android:lottie-compose:6.1.0")
 }

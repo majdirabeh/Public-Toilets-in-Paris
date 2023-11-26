@@ -37,6 +37,11 @@
             android:exported="true"
             android:theme="@style/Theme.PublicToilets" />
 
+        <activity
+            android:name="fr.dev.majdi.presentation.NavigationActivity"
+            android:theme="@style/Theme.Design.Light.NoActionBar"
+            android:exported="true" />
+
         <meta-data
             android:name="com.mapbox.token"
             android:value="@string/mapbox_access_token" />

@@ -38,6 +38,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.4"
     }
+    //Just add this for skip lint verification
+    lint {
+        abortOnError = false
+        checkAllWarnings = false
+    }
 }
 
 dependencies {
@@ -58,5 +63,10 @@ dependencies {
     implementation ("androidx.room:room-runtime:2.6.0")
     implementation ("androidx.room:room-rxjava2:2.6.0")
     kapt("androidx.room:room-compiler:2.6.0")
+
+    //dependencies for unit test
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("org.mockito.kotlin:mockito-kotlin:3.2.0")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
 }

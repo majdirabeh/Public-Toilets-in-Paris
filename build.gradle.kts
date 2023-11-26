@@ -9,4 +9,6 @@ plugins {
     id("com.google.gms.google-services") version "4.4.0" apply false
     // Add the dependency for the Crashlytics Gradle plugin
     id("com.google.firebase.crashlytics") version "2.9.9" apply false
+
+    id("org.jetbrains.kotlin.jvm") version "1.5.21" apply false
 }
