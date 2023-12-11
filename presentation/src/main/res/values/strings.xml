@@ -11,7 +11,7 @@
     <string name="list_item_pmr">PMR Access: </string>
     <string name="list_item_distance">Distance: </string>
 
-    <string name="mapbox_access_token">pk.eyJ1IjoibWFqZGlyYWJlaGRldiIsImEiOiJjbHBkODk2dXYxMXI3MmlvNmNnZzE2cTJxIn0.6RC1FrIVp9mwFCuhKZEOkQ</string>
+    <string name="mapbox_access_token"></string>
 
     <string name="internet_message">No internet connexion please check your wifi</string>
 
